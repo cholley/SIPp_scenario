@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE scenario SYSTEM "sipp.dtd">
+
+
+
+<scenario name="Responder">
+
+  <recv request="INVITE" crlf="true">
+  </recv>
+
+   <send>
+    <![CDATA[
+      SIP/2.0 100 Trying
+      [last_Via:]
+      [last_From:]
+      [last_To:];tag=[pid]SIPpTag01[call_number]
+      [last_Call-ID:]
+      [last_CSeq:]
+      Contact: <sip:[field0]@[local_ip]:[local_port];transport=[transport]>
+      Content-Length: 0
+    ]]>
+  </send>
+
+  <send>
+    <![CDATA[
+      SIP/2.0 180 Ringing
+      [last_Via:]
+      [last_From:]
+      [last_To:];tag=[pid]SIPpTag01[call_number]
+      [last_Call-ID:]
+      [last_CSeq:]
+      Contact: <sip:[field0]@[local_ip]:[local_port];transport=[transport]>
+      Content-Length: 0
+      Subject: Performance Test
+      Content-Length: 0
+    ]]>
+  </send>
+
+  <send>
+    <![CDATA[
+    SIP/2.0 200 OK
+    [last_Via:]
+    [last_From:]
+    [last_To:];tag=[pid]SIPpTag01[call_number]
+    [last_Call-ID:]
+    [last_CSeq:]
+    Contact: <sip:[field0]@[local_ip]:[local_port];transport=[transport]>
+    Content-Type: application/sdp
+    Content-Length: [len]
+
+    v=0
+    o=doubango 1983 678901 IN IP4 [local_ip]
+    s=-
+    c=IN IP4 [local_ip]
+    t=0 0
+    a=tcap:1 RTP/AVPF
+    m=audio 7664 RTP/AVP 8 0 3 97 101
+    a=ptime:20
+    a=minptime:1
+    a=maxptime:255
+    a=silenceSupp:off - - - -
+    a=rtpmap:8 PCMA/8000/1
+    a=rtpmap:0 PCMU/8000/1
+    a=rtpmap:3 GSM/8000/1
+    a=rtpmap:97 SPEEX/8000/1
+    a=rtpmap:101 telephone-event/8000/1
+    a=fmtp:101 0-16
+    a=pcfg:1 t=1
+    a=sendrecv
+    a=rtcp-mux
+    a=ssrc:1605063467 cname:dd5a5d698cbecc9ab405bb51f0b583f5
+    a=ssrc:1605063467 mslabel:6994f7d1-6ce9-4fbd-acfd-84e5131ca2e2
+    a=ssrc:1605063467 label:doubango@audio
+    ]]>
+  </send>
+
+  <recv request="ACK">
+  </recv>
+
+
+
+  <recv request="BYE">
+  </recv>
+
+  <send>
+    <![CDATA[
+      SIP/2.0 200 OK
+      [last_Via:]
+      [last_From:]
+      [last_To:]
+      [last_Call-ID:]
+      [last_CSeq:]
+      Contact: <sip:[field0]@[local_ip]:[local_port];transport=[transport]>
+      Content-Length: 0
+    ]]>
+  </send>
+
+
+  <!-- Keep the call open for a while in case the 200 is lost to be     -->
+  <!-- able to retransmit it if we receive the BYE again.               -->
+  <timewait milliseconds="4000"/>
+
+
+  <!-- definition of the response time repartition table (unit is ms)   -->
+  <ResponseTimeRepartition value="10, 20, 30, 40, 50, 100, 150, 200"/>
+
+  <!-- definition of the call length repartition table (unit is ms)     -->
+  <CallLengthRepartition value="10, 50, 100, 500, 1000, 5000, 10000"/>
+
+</scenario>
+
